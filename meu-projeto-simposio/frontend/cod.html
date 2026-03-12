@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I Simpósio de Tecnologia e Inovação</title>
+  <!-- Tailwind CSS via CDN para estilização rápida e moderna (Fase de Projeto) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'uni-blue': '#2E3192', /* Azul UEPA */
+            'uni-light': '#F3F6F8',
+            'uni-accent': '#E31B23', /* Vermelho UEPA */
+            'uni-accent-hover': '#BA141C' /* Vermelho escuro para hover */
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Estilos adicionais para o modal de inscrição */
+    .modal-hidden {
+      display: none;
+    }
+
+    .modal-active {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans flex flex-col min-h-screen">
+
+
+  <!-- Navegação (Top Bar) -->
+  <nav class="bg-uni-blue text-white shadow-lg fixed w-full z-50 top-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-graduation-cap text-2xl"></i>
+          <span class="font-bold text-xl tracking-wider">UEPA</span>
+        </div>
+        <!-- Menu Desktop -->
+        <div class="hidden md:flex space-x-8">
+          <a href="#inicio" class="hover:text-uni-accent transition">Início</a>
+          <a href="#sobre" class="hover:text-uni-accent transition">Sobre</a>
+          <a href="#palestrantes" class="hover:text-uni-accent transition">Palestrantes</a>
+          <a href="#programacao" class="hover:text-uni-accent transition">Programação</a>
+        </div>
+        <!-- Botão Inscrição Nav -->
+        <button onclick="toggleModal()"
+          class="hidden md:block bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition shadow">
+          Inscreva-se
+        </button>
+        <button onclick="toggleLoginModal()" class="hidden md:block bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition shadow">
+          Entrar
+        </button>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- Seção Hero (Início) -->
+  <header id="inicio"
+    class="pt-24 pb-12 md:pt-32 md:pb-20 bg-gradient-to-br from-uni-blue to-[#1A1C54] text-white flex-grow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+      <span class="text-uni-accent font-semibold tracking-widest uppercase mb-2">Evento Acadêmico Oficial</span>
+      <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+        I Simpósio de <br />Tecnologia e Inovação
+      </h1>
+      <p class="text-xl md:text-2xl mb-8 text-blue-200 max-w-2xl">
+        Conectando a academia ao futuro. Junte-se a nós para três dias de palestras, workshops e networking.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 items-center justify-center mb-10 text-lg">
+        <div class="flex items-center gap-2">
+          <i class="fa-regular fa-calendar"></i>
+          <span>15 a 17 de Maio de 2026</span>
+        </div>
+        <div class="hidden sm:block">|</div>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Auditório Principal - Campus Central</span>
+        </div>
+      </div>
+      <button onclick="toggleModal()"
+        class="bg-uni-accent hover:bg-uni-accent-hover text-white text-lg font-bold py-4 px-10 rounded-full transition shadow-xl transform hover:scale-105">
+        Garantir Minha Vaga
+      </button>
+    </div>
+  </header>
+
+
+  <!-- Seção Sobre -->
+  <section id="sobre" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-uni-blue mb-4">Sobre o Evento</h2>
+        <div class="h-1 w-20 bg-uni-accent mx-auto rounded"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div>
+          <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+            O <strong>SUTI 2026</strong> é um espaço dedicado ao debate e disseminação do conhecimento científico nas
+            áreas de tecnologia da informação, inteligência artificial e engenharia de software.
+          </p>
+          <p class="text-lg text-gray-600 leading-relaxed">
+            Nosso objetivo é criar uma ponte entre os estudantes da universidade, pesquisadores renomados e o mercado de
+            trabalho, fomentando a inovação e o desenvolvimento de novas tecnologias no estado. Haverá emissão de
+            certificado de 30 horas complementares.
+          </p>
+        </div>
+        <div class="bg-uni-light p-8 rounded-xl border border-blue-100 shadow-inner flex flex-col gap-4">
+          <div class="flex items-start gap-4">
+            <div class="bg-uni-blue text-white p-3 rounded-lg"><i class="fa-solid fa-certificate text-xl"></i></div>
+            <div>
+              <h4 class="font-bold text-xl">Certificação</h4>
+              <p class="text-gray-600">Certificado oficial da instituição (30h).</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="bg-uni-blue text-white p-3 rounded-lg"><i class="fa-solid fa-people-group text-xl"></i></div>
+            <div>
+              <h4 class="font-bold text-xl">Networking</h4>
+              <p class="text-gray-600">Contato direto com profissionais da área.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Seção Palestrantes -->
+  <section id="palestrantes" class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-uni-blue mb-4">Palestrantes Confirmados</h2>
+        <div class="h-1 w-20 bg-uni-accent mx-auto rounded"></div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Palestrante 1 -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
+          <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <!-- Placeholder para imagem -->
+            <div
+              class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">
+              AS</div>
+          </div>
+          <div class="p-6 text-center">
+            <h3 class="font-bold text-xl mb-1">Prof. Dr. Alan Silva</h3>
+            <p class="text-sm text-uni-accent font-semibold mb-3">Inteligência Artificial</p>
+            <p class="text-gray-600 text-sm">Pesquisador chefe do laboratório de IA da Universidade Estadual. Autor de
+              diversos artigos internacionais.</p>
+          </div>
+        </div>
+
+
+        <!-- Palestrante 2 -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
+          <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <div
+              class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">
+              MC</div>
+          </div>
+          <div class="p-6 text-center">
+            <h3 class="font-bold text-xl mb-1">Dra. Mariana Costa</h3>
+            <p class="text-sm text-uni-accent font-semibold mb-3">Segurança da Informação</p>
+            <p class="text-gray-600 text-sm">Consultora de cibersegurança e ex-aluna da instituição. Especialista em
+              testes de invasão.</p>
+          </div>
+        </div>
+
+
+        <!-- Palestrante 3 -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
+          <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <div
+              class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">
+              RO</div>
+          </div>
+          <div class="p-6 text-center">
+            <h3 class="font-bold text-xl mb-1">MSc. Roberto Oliveira</h3>
+            <p class="text-sm text-uni-accent font-semibold mb-3">Engenharia de Software</p>
+            <p class="text-gray-600 text-sm">Tech Lead em uma multinacional. Abordará metodologias ágeis e arquitetura
+              de sistemas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Seção Programação -->
+  <section id="programacao" class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-uni-blue mb-4">Programação</h2>
+        <div class="h-1 w-20 bg-uni-accent mx-auto rounded"></div>
+      </div>
+
+
+      <div class="bg-white border border-gray-200 rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-uni-blue text-white">
+            <tr>
+              <th scope="col" class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Horário</th>
+              <th scope="col" class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Atividade</th>
+              <th scope="col"
+                class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider hidden sm:table-cell">Local
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <!-- Linha 1 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">08:00 - 09:00</td>
+              <td class="px-6 py-4 text-sm text-gray-500">Credenciamento e Coffee Break</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Saguão Principal</td>
+            </tr>
+            <!-- Linha 2 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">09:00 - 10:30</td>
+              <td class="px-6 py-4 text-sm text-gray-500 font-semibold text-uni-blue">Palestra de Abertura: O Futuro da
+                IA <br /><span class="font-normal text-xs text-gray-400">Prof. Dr. Alan Silva</span></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Auditório 1</td>
+            </tr>
+            <!-- Linha 3 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">10:45 - 12:00</td>
+              <td class="px-6 py-4 text-sm text-gray-500">Mesa Redonda: Mercado de Trabalho na Região Norte</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Auditório 1</td>
+            </tr>
+            <!-- Linha 4 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">14:00 - 17:00</td>
+              <td class="px-6 py-4 text-sm text-gray-500">Workshops Práticos (Várias Salas)</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Laboratórios (Bloco B)
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white mt-auto py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <i class="fa-solid fa-graduation-cap text-2xl text-uni-accent"></i>
+          <span class="font-bold text-xl">Universidade do Estado do Pará</span>
+        </div>
+        <p class="text-gray-400 text-sm">Fomentando a educação, ciência e tecnologia para o desenvolvimento da
+          sociedade.</p>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4 text-uni-accent">Contato da Organização</h4>
+        <p class="text-gray-400 text-sm mb-2"><i class="fa-solid fa-envelope mr-2"></i> evento@universidade.edu.br</p>
+        <p class="text-gray-400 text-sm"><i class="fa-solid fa-phone mr-2"></i> (00) 1234-5678</p>
+      </div>
+      <div>
+        <h4 class="font-bold mb-4 text-uni-accent">Siga-nos</h4>
+        <div class="flex gap-4">
+          <a href="#" class="text-gray-400 hover:text-white transition"><i
+              class="fa-brands fa-instagram text-2xl"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i
+              class="fa-brands fa-linkedin text-2xl"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i
+              class="fa-brands fa-youtube text-2xl"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-500">
+      &copy; 2026 Simpósio Acadêmico. Todos os direitos reservados. (Projeto Cascata)
+    </div>
+  </footer>
+
+
+  <!-- Modal de Inscrição (Escondido por padrão) -->
+  <div id="inscricaoModal"
+    class="modal-hidden fixed inset-0 bg-black bg-opacity-60 z-[60] justify-center items-center backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md p-6 relative">
+      <button onclick="toggleModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition">
+        <i class="fa-solid fa-xmark text-2xl"></i>
+      </button>
+      <h3 class="text-2xl font-bold text-uni-blue mb-4">Formulário de Inscrição</h3>
+      <p class="text-gray-600 text-sm mb-6">Preencha seus dados para garantir sua vaga no SUTI 2026.</p>
+
+      <form id="formInscricao" onsubmit="realizarInscricao(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+          <input type="text" required
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">E-mail Institucional</label>
+          <input type="email" required
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula (Opcional para externos)</label>
+          <input type="text"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
+        </div>
+        <button type="submit"
+          class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition mt-4">
+          Confirmar Inscrição
+        </button>
+      </form>
+
+
+      <!-- Mensagem de Sucesso (escondida por padrão) -->
+      <div id="mensagemSucesso" class="hidden text-center py-6">
+        <div class="text-green-500 text-5xl mb-4"><i class="fa-solid fa-circle-check"></i></div>
+        <h4 class="text-xl font-bold text-gray-800 mb-2">Inscrição Realizada!</h4>
+        <p class="text-gray-600 text-sm mb-6">Você receberá a confirmação no seu e-mail.</p>
+        <button onclick="toggleModal()"
+          class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginModal" class="modal-hidden fixed inset-0 bg-black bg-opacity-60 z-[60] justify-center items-center backdrop-blur-sm">
+  <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md p-6 relative">
+    <button onclick="toggleLoginModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition">
+      <i class="fa-solid fa-xmark text-2xl"></i>
+    </button>
+    <h3 class="text-2xl font-bold text-uni-blue mb-4">Entrar no Sistema</h3>
+    
+    <form onsubmit="realizarLogin(event)" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Seu E-mail</label>
+        <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none">
+      </div>
+      <button type="submit" class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition">
+        Entrar
+      </button>
+    </form>
+  </div>
+</div>
+
+
+  <!-- Regras de Negócio e Interatividade (Simulando Back-end leve) -->
+  <script>
+    const modal = document.getElementById('inscricaoModal');
+    const form = document.getElementById('formInscricao');
+    const sucessoMsg = document.getElementById('mensagemSucesso');
+
+
+    // Função para abrir/fechar o modal de inscrição
+    function toggleModal() {
+      if (modal.classList.contains('modal-hidden')) {
+        modal.classList.remove('modal-hidden');
+        modal.classList.add('modal-active');
+        // Reseta o form sempre que abrir
+        form.style.display = 'block';
+        sucessoMsg.classList.add('hidden');
+        form.reset();
+      } else {
+        modal.classList.add('modal-hidden');
+        modal.classList.remove('modal-active');
+      }
+    }
+
+    // Função para abrir/fechar o modal de Login
+function toggleLoginModal() {
+    const modal = document.getElementById('loginModal');
+    modal.classList.toggle('modal-hidden');
+    modal.classList.toggle('modal-active');
+}
+
+// Função que chama o backend para logar
+async function realizarLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+
+    try {
+        const resposta = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+            alert(resultado.mensagem);
+            toggleLoginModal();
+            // Aqui você poderia redirecionar o usuário para uma área restrita
+        } else {
+            alert(resultado.mensagem);
+        }
+    } catch (erro) {
+        alert("Erro ao conectar com o servidor.");
+    }
+}
+
+
+    // Função que realiza o envio dos dados (Fase de Implementação Back-end mockada)
+    async function realizarInscricao(event) {
+  event.preventDefault(); // Impede a página de recarregar
+
+  // 1. Pegamos os valores dos campos de entrada
+  const nome = event.target.querySelector('input[type="text"]').value;
+  const email = event.target.querySelector('input[type="email"]').value;
+
+  try {
+    // 2. Enviamos para o servidor (a ponte!)
+    const resposta = await fetch('http://localhost:3000/registrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email }) // Transforma os dados em texto para o servidor
+    });
+
+    const resultado = await resposta.json();
+
+    if (resposta.ok) {
+      // 3. Se o servidor respondeu OK, mostramos a mensagem de sucesso
+      form.style.display = 'none';
+      sucessoMsg.classList.remove('hidden');
+      console.log("Resposta do servidor:", resultado.mensagem);
+    }
+  } catch (erro) {
+    console.error("Erro ao conectar com o servidor:", erro);
+    alert("Opa! O servidor está desligado?");
+  }
+}
+  </script>
+</body>
+
+</html>
