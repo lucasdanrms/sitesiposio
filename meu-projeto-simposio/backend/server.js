@@ -41,9 +41,9 @@ app.post('/registrar', async (req, res) => {
 });
 
 // --- ROTA DE LOGIN (Com Comparação Segura) ---
+// --- ROTA DE LOGIN (Ajustada) ---
 app.post('/login', (req, res) => {
     const { email, senha } = req.body;
-
     const sql = `SELECT * FROM inscritos WHERE email = ?`;
 
     db.get(sql, [email], async (err, row) => {
@@ -51,11 +51,17 @@ app.post('/login', (req, res) => {
             return res.status(401).send({ mensagem: "E-mail ou senha incorretos." });
         }
 
-        // 3. Comparamos a senha digitada com a criptografada que está no banco
         const senhaValida = await bcrypt.compare(senha, row.senha);
 
         if (senhaValida) {
-            res.status(200).send({ mensagem: `Bem-vindo, ${row.nome}!` });
+            // SEGURANÇA: Removemos a senha do objeto 'row' antes de enviar para o navegador
+            delete row.senha;
+
+            // ENVIAMOS A MENSAGEM E OS DADOS DO USUÁRIO
+            res.status(200).send({ 
+                mensagem: `Bem-vindo, ${row.nome}!`,
+                usuario: row // <--- Adicione esta linha aqui!
+            });
         } else {
             res.status(401).send({ mensagem: "E-mail ou senha incorretos." });
         }

@@ -54,14 +54,19 @@
           <a href="#programacao" class="hover:text-uni-accent transition">Programação</a>
         </div>
         <!-- Botão Inscrição Nav -->
-        <button onclick="toggleModal()"
-          class="hidden md:block bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition shadow">
-          Inscreva-se
-        </button>
-        <button onclick="toggleLoginModal()" class="hidden md:block bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition shadow">
-          Entrar
-        </button>
+        <div class="hidden md:flex items-center space-x-6">
+        <div id="visitanteLinks" class="flex items-center space-x-4">
+        <button onclick="toggleLoginModal()"   class="bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition">Entrar</button>
+        <button onclick="toggleModal()" class="bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition">
+        Inscreva-se
+      </button>
       </div>
+      <div id="alunoLinks" class="hidden flex items-center space-x-4">
+    <span class="text-blue-200">Olá, <strong id="nomeAluno" class="text-white"></strong>!</span>
+    <button onclick="realizarLogout()" class="bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition">Sair</button>
+    </div>
+      </div>
+
     </div>
   </nav>
 
@@ -93,7 +98,19 @@
         Garantir Minha Vaga
       </button>
     </div>
-  </header>
+  <!-- Seção area do aluno -->
+  <section id="areaDoAluno" class="hidden py-8 bg-blue-50 border-b border-blue-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-200">
+      <h3 class="text-xl font-bold text-uni-blue mb-2">Seu Painel de Inscrito</h3>
+      <p class="text-gray-600">Você já tem acesso aos materiais exclusivos e ao QR Code de credenciamento.</p>
+      <div class="mt-4 flex gap-4">
+        <button class="text-sm bg-uni-blue text-white px-4 py-2 rounded hover:bg-opacity-90">Ver Cronograma</button>
+        <button class="text-sm border border-uni-blue text-uni-blue px-4 py-2 rounded hover:bg-blue-50">Baixar Guia</button>
+      </div>
+    </div>
+  </div>
+  </section>
 
 
   <!-- Seção Sobre -->
@@ -299,22 +316,22 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
           <input type="text" required
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue text-gray-700">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">E-mail Institucional</label>
           <input type="email" required
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue text-gray-700">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">crie sua senha</label>
           <input type="password" id="regSenha" required
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue text-gray-700">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula (Opcional para externos)</label>
           <input type="text"
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue text-gray-700">
         </div>
         <button type="submit"
           class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition mt-4">
@@ -346,11 +363,11 @@
     <form onsubmit="realizarLogin(event)" class="space-y-4">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Seu E-mail</label>
-        <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none">
+        <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none text-gray-700">
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Sua senha</label>
-        <input type="password" id="loginSenha" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none">
+        <input type="password" id="loginSenha" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none text-gray-700">
       </div>
       <button type="submit" class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition">
         Entrar
@@ -391,29 +408,28 @@ function toggleLoginModal() {
 
 // Função que chama o backend para logar
 async function realizarLogin(event) {
-  event.preventDefault();
-  
-  const email = document.getElementById('loginEmail').value;
-  const senha = document.getElementById('loginSenha').value; // Pegando a senha
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const senha = document.getElementById('loginSenha').value;
 
-  try {
-    const resposta = await fetch('http://localhost:3000/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, senha }) // Enviando para conferência
-    });
+    try {
+        const resposta = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
+        });
 
-    const resultado = await resposta.json();
+        const resultado = await resposta.json();
 
-    if (resposta.ok) {
-      alert(resultado.mensagem);
-      toggleLoginModal();
-    } else {
-      alert(resultado.mensagem); // "E-mail ou senha incorretos"
+        if (resposta.ok) {
+            toggleLoginModal();
+            atualizarInterface(resultado.usuario); // Aqui a interface muda!
+        } else {
+            alert(resultado.mensagem);
+        }
+    } catch (erro) {
+        alert("Erro ao conectar com o servidor.");
     }
-  } catch (erro) {
-    alert("Erro ao conectar com o servidor.");
-  }
 }
 
 
@@ -439,6 +455,37 @@ async function realizarLogin(event) {
   } catch (erro) {
     alert("Erro ao conectar com o servidor.");
   }
+}
+
+// Função que atualiza a interface para o modo "Logado"
+function atualizarInterface(usuario) {
+    // Esconde botões de visitante e mostra os de aluno
+    document.getElementById('visitanteLinks').classList.add('hidden');
+    document.getElementById('alunoLinks').classList.remove('hidden');
+    document.getElementById('areaDoAluno').classList.remove('hidden');
+
+    // Coloca o nome do aluno no texto
+    document.getElementById('nomeAluno').innerText = usuario.nome;
+}
+
+// Função para Sair (Logout)
+function realizarLogout() {
+    // 1. Inverte a visibilidade das seções
+    document.getElementById('visitanteLinks').classList.remove('hidden');
+    document.getElementById('alunoLinks').classList.add('hidden');
+    document.getElementById('areaDoAluno').classList.add('hidden');
+    
+    // 2. LIMPEZA: Reseta os campos de login e registro
+    // Você pode limpar um por um pelo ID:
+    document.getElementById('loginEmail').value = "";
+    document.getElementById('loginSenha').value = "";
+    
+    // Dica de Engenharia: Também é bom limpar o formulário de registro
+    // se você tiver atribuído um ID ao form (ex: id="formInscricao")
+    const formInscricao = document.getElementById('formInscricao');
+    if (formInscricao) formInscricao.reset();
+
+    alert("Você saiu do sistema com segurança.");
 }
   </script>
 </body>
