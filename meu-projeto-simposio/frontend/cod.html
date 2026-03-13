@@ -307,6 +307,11 @@
             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
         </div>
         <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">crie sua senha</label>
+          <input type="password" id="regSenha" required
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
+        </div>
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula (Opcional para externos)</label>
           <input type="text"
             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue">
@@ -342,6 +347,10 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Seu E-mail</label>
         <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Sua senha</label>
+        <input type="password" id="loginSenha" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none">
       </div>
       <button type="submit" class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition">
         Entrar
@@ -382,58 +391,53 @@ function toggleLoginModal() {
 
 // Função que chama o backend para logar
 async function realizarLogin(event) {
-    event.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-
-    try {
-        const resposta = await fetch('http://localhost:3000/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-        });
-
-        const resultado = await resposta.json();
-
-        if (resposta.ok) {
-            alert(resultado.mensagem);
-            toggleLoginModal();
-            // Aqui você poderia redirecionar o usuário para uma área restrita
-        } else {
-            alert(resultado.mensagem);
-        }
-    } catch (erro) {
-        alert("Erro ao conectar com o servidor.");
-    }
-}
-
-
-    // Função que realiza o envio dos dados (Fase de Implementação Back-end mockada)
-    async function realizarInscricao(event) {
-  event.preventDefault(); // Impede a página de recarregar
-
-  // 1. Pegamos os valores dos campos de entrada
-  const nome = event.target.querySelector('input[type="text"]').value;
-  const email = event.target.querySelector('input[type="email"]').value;
+  event.preventDefault();
+  
+  const email = document.getElementById('loginEmail').value;
+  const senha = document.getElementById('loginSenha').value; // Pegando a senha
 
   try {
-    // 2. Enviamos para o servidor (a ponte!)
-    const resposta = await fetch('http://localhost:3000/registrar', {
+    const resposta = await fetch('http://localhost:3000/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, email }) // Transforma os dados em texto para o servidor
+      body: JSON.stringify({ email, senha }) // Enviando para conferência
     });
 
     const resultado = await resposta.json();
 
     if (resposta.ok) {
-      // 3. Se o servidor respondeu OK, mostramos a mensagem de sucesso
-      form.style.display = 'none';
-      sucessoMsg.classList.remove('hidden');
-      console.log("Resposta do servidor:", resultado.mensagem);
+      alert(resultado.mensagem);
+      toggleLoginModal();
+    } else {
+      alert(resultado.mensagem); // "E-mail ou senha incorretos"
     }
   } catch (erro) {
-    console.error("Erro ao conectar com o servidor:", erro);
-    alert("Opa! O servidor está desligado?");
+    alert("Erro ao conectar com o servidor.");
+  }
+}
+
+
+    // Função que realiza o envio dos dados (Fase de Implementação Back-end mockada)
+    async function realizarInscricao(event) {
+  event.preventDefault();
+  
+  const nome = event.target.querySelector('input[type="text"]').value;
+  const email = event.target.querySelector('input[type="email"]').value;
+  const senha = document.getElementById('regSenha').value; // Pegando a senha
+
+  try {
+    const resposta = await fetch('http://localhost:3000/registrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email, senha }) // Enviando a senha
+    });
+
+    if (resposta.ok) {
+      form.style.display = 'none';
+      sucessoMsg.classList.remove('hidden');
+    }
+  } catch (erro) {
+    alert("Erro ao conectar com o servidor.");
   }
 }
   </script>
