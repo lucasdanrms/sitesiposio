@@ -1,71 +1,84 @@
 const express = require('express');
+const mysql = require('mysql2/promise');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
-const bcrypt = require('bcryptjs'); // 1. Importamos a ferramenta de segurança
+const bcrypt = require('bcryptjs');
+const path = require('path');
+
 const app = express();
+const port = 3000;
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// --- CONFIGURAÇÃO DO BANCO DE DADOS ---
-const db = new sqlite3.Database('./dados.db');
+// Serve os arquivos estáticos (Seu HTML)
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Atualizamos a tabela para aceitar a coluna 'senha'
-db.run(`
-    CREATE TABLE IF NOT EXISTS inscritos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        email TEXT NOT NULL,
-        senha TEXT NOT NULL 
-    )
-`);
+// Configuração do Pool de Conexão com MySQL
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'db', // Nome do serviço no docker-compose
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'root',
+    database: process.env.DB_NAME || 'simposio_db',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
-// --- ROTA DE REGISTRO (Com Criptografia) ---
+// Rota de Registro
 app.post('/registrar', async (req, res) => {
-    const { nome, email, senha } = req.body; // Recebemos a senha do HTML
+    const { nome, email, senha } = req.body;
+
+    if (!nome || !email || !senha) {
+        return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios.' });
+    }
 
     try {
-        // 2. Criptografamos a senha antes de salvar
+        // Criptografar a senha antes de salva
         const salt = await bcrypt.genSalt(10);
-        const senhaCriptografada = await bcrypt.hash(senha, salt);
+        const senhaHash = await bcrypt.hash(senha, salt);
 
-        const sql = `INSERT INTO inscritos (nome, email, senha) VALUES (?, ?, ?)`;
-        
-        db.run(sql, [nome, email, senhaCriptografada], function(err) {
-            if (err) return res.status(500).send({ mensagem: "Erro ao salvar" });
-            res.status(200).send({ mensagem: "Usuário registrado com segurança!" });
-        });
+        const [result] = await pool.query(
+            'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)',
+            [nome, email, senhaHash]
+        );
+
+        res.status(201).json({ mensagem: 'Usuário registrado com sucesso!' });
     } catch (erro) {
-        res.status(500).send({ mensagem: "Erro ao processar senha" });
+        if (erro.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ mensagem: 'E-mail já cadastrado.' });
+        }
+        res.status(500).json({ mensagem: 'Erro interno no servidor.' });
     }
 });
 
-// --- ROTA DE LOGIN (Com Comparação Segura) ---
-// --- ROTA DE LOGIN (Ajustada) ---
-app.post('/login', (req, res) => {
+// Rota de Login
+app.post('/login', async (req, res) => {
     const { email, senha } = req.body;
-    const sql = `SELECT * FROM inscritos WHERE email = ?`;
 
-    db.get(sql, [email], async (err, row) => {
-        if (err || !row) {
-            return res.status(401).send({ mensagem: "E-mail ou senha incorretos." });
+    try {
+        const [rows] = await pool.query('SELECT * FROM usuarios WHERE email = ?', [email]);
+        const usuario = rows[0];
+
+        if (!usuario) {
+            return res.status(401).json({ mensagem: 'E-mail ou senha incorretos.' });
         }
 
-        const senhaValida = await bcrypt.compare(senha, row.senha);
-
-        if (senhaValida) {
-            // SEGURANÇA: Removemos a senha do objeto 'row' antes de enviar para o navegador
-            delete row.senha;
-
-            // ENVIAMOS A MENSAGEM E OS DADOS DO USUÁRIO
-            res.status(200).send({ 
-                mensagem: `Bem-vindo, ${row.nome}!`,
-                usuario: row // <--- Adicione esta linha aqui!
-            });
-        } else {
-            res.status(401).send({ mensagem: "E-mail ou senha incorretos." });
+        // Comparar a senha digitada com o Hash do banco
+        const senhaValida = await bcrypt.compare(senha, usuario.senha);
+        if (!senhaValida) {
+            return res.status(401).json({ mensagem: 'E-mail ou senha incorretos.' });
         }
-    });
+
+        // Retorna os dados do usuário (sem a senha) para o front-end
+        res.status(200).json({
+            mensagem: 'Login realizado com sucesso',
+            usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email }
+        });
+    } catch (erro) {
+        res.status(500).json({ mensagem: 'Erro interno no servidor.' });
+    }
 });
 
-app.listen(3000, () => console.log("> Servidor rodando em http://localhost:3000"));
+app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
+});

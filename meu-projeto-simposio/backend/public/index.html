@@ -413,7 +413,7 @@ async function realizarLogin(event) {
     const senha = document.getElementById('loginSenha').value;
 
     try {
-        const resposta = await fetch('http://localhost:3000/login', {
+        const resposta = await fetch('/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })
@@ -442,7 +442,7 @@ async function realizarLogin(event) {
   const senha = document.getElementById('regSenha').value; // Pegando a senha
 
   try {
-    const resposta = await fetch('http://localhost:3000/registrar', {
+    const resposta = await fetch('/registrar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nome, email, senha }) // Enviando a senha
