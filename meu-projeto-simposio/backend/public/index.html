@@ -5,40 +5,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I Simpósio de Tecnologia e Inovação</title>
-  <!-- Tailwind CSS via CDN para estilização rápida e moderna (Fase de Projeto) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome para ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            'uni-blue': '#2E3192', /* Azul UEPA */
+            'uni-blue': '#2E3192',
             'uni-light': '#F3F6F8',
-            'uni-accent': '#E31B23', /* Vermelho UEPA */
-            'uni-accent-hover': '#BA141C' /* Vermelho escuro para hover */
+            'uni-accent': '#E31B23',
+            'uni-accent-hover': '#BA141C'
           }
         }
       }
     }
   </script>
   <style>
-    /* Estilos adicionais para o modal de inscrição */
-    .modal-hidden {
-      display: none;
-    }
+    .modal-hidden { display: none; }
+    .modal-active  { display: flex; }
 
-    .modal-active {
-      display: flex;
+    /* Toast de notificação */
+    #toast {
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    #toast.hide {
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
 
 <body class="bg-gray-50 text-gray-800 font-sans flex flex-col min-h-screen">
 
+  <!-- ======== TOAST DE NOTIFICAÇÃO ======== -->
+  <div id="toast"
+    class="hide fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white text-sm font-medium max-w-sm">
+    <i id="toastIcon" class="text-lg"></i>
+    <span id="toastMsg"></span>
+  </div>
 
-  <!-- Navegação (Top Bar) -->
+  <!-- ======== NAVEGAÇÃO ======== -->
   <nav class="bg-uni-blue text-white shadow-lg fixed w-full z-50 top-0">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
@@ -48,32 +60,40 @@
         </div>
         <!-- Menu Desktop -->
         <div class="hidden md:flex space-x-8">
-          <a href="#inicio" class="hover:text-uni-accent transition">Início</a>
-          <a href="#sobre" class="hover:text-uni-accent transition">Sobre</a>
+          <a href="#inicio"       class="hover:text-uni-accent transition">Início</a>
+          <a href="#sobre"        class="hover:text-uni-accent transition">Sobre</a>
           <a href="#palestrantes" class="hover:text-uni-accent transition">Palestrantes</a>
-          <a href="#programacao" class="hover:text-uni-accent transition">Programação</a>
+          <a href="#programacao"  class="hover:text-uni-accent transition">Programação</a>
         </div>
-        <!-- Botão Inscrição Nav -->
-        <div class="hidden md:flex items-center space-x-6">
-        <div id="visitanteLinks" class="flex items-center space-x-4">
-        <button onclick="toggleLoginModal()"   class="bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition">Entrar</button>
-        <button onclick="toggleModal()" class="bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition">
-        Inscreva-se
-      </button>
+        <!-- Botões Nav -->
+        <div class="hidden md:flex items-center space-x-4">
+          <!-- Visitante -->
+          <div id="visitanteLinks" class="flex items-center space-x-4">
+            <button onclick="toggleLoginModal()"
+              class="bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition">
+              Entrar
+            </button>
+            <button onclick="abrirModalInscricao()"
+              class="bg-white text-uni-blue font-bold py-2 px-4 rounded transition hover:bg-gray-100">
+              Inscreva-se
+            </button>
+          </div>
+          <!-- Aluno logado -->
+          <div id="alunoLinks" class="hidden items-center space-x-4">
+            <span class="text-blue-200">Olá, <strong id="nomeAluno" class="text-white"></strong>!</span>
+            <button onclick="realizarLogout()"
+              class="bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition">
+              Sair
+            </button>
+          </div>
+        </div>
       </div>
-      <div id="alunoLinks" class="hidden flex items-center space-x-4">
-    <span class="text-blue-200">Olá, <strong id="nomeAluno" class="text-white"></strong>!</span>
-    <button onclick="realizarLogout()" class="bg-uni-accent hover:bg-uni-accent-hover text-white font-bold py-2 px-4 rounded transition">Sair</button>
-    </div>
-      </div>
-
     </div>
   </nav>
 
-
-  <!-- Seção Hero (Início) -->
+  <!-- ======== HERO ======== -->
   <header id="inicio"
-    class="pt-24 pb-12 md:pt-32 md:pb-20 bg-gradient-to-br from-uni-blue to-[#1A1C54] text-white flex-grow">
+    class="pt-24 pb-12 md:pt-32 md:pb-20 bg-gradient-to-br from-uni-blue to-[#1A1C54] text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
       <span class="text-uni-accent font-semibold tracking-widest uppercase mb-2">Evento Acadêmico Oficial</span>
       <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
@@ -93,27 +113,28 @@
           <span>Auditório Principal - Campus Central</span>
         </div>
       </div>
-      <button onclick="toggleModal()"
+      <button onclick="abrirModalInscricao()"
         class="bg-uni-accent hover:bg-uni-accent-hover text-white text-lg font-bold py-4 px-10 rounded-full transition shadow-xl transform hover:scale-105">
         Garantir Minha Vaga
       </button>
     </div>
-  <!-- Seção area do aluno -->
+  </header>
+
+  <!-- ======== PAINEL DO ALUNO ======== -->
   <section id="areaDoAluno" class="hidden py-8 bg-blue-50 border-b border-blue-100">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-200">
-      <h3 class="text-xl font-bold text-uni-blue mb-2">Seu Painel de Inscrito</h3>
-      <p class="text-gray-600">Você já tem acesso aos materiais exclusivos e ao QR Code de credenciamento.</p>
-      <div class="mt-4 flex gap-4">
-        <button class="text-sm bg-uni-blue text-white px-4 py-2 rounded hover:bg-opacity-90">Ver Cronograma</button>
-        <button class="text-sm border border-uni-blue text-uni-blue px-4 py-2 rounded hover:bg-blue-50">Baixar Guia</button>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-200">
+        <h3 class="text-xl font-bold text-uni-blue mb-2">Seu Painel de Inscrito</h3>
+        <p class="text-gray-600">Você já tem acesso aos materiais exclusivos e ao QR Code de credenciamento.</p>
+        <div class="mt-4 flex gap-4">
+          <button class="text-sm bg-uni-blue text-white px-4 py-2 rounded hover:bg-opacity-90">Ver Cronograma</button>
+          <button class="text-sm border border-uni-blue text-uni-blue px-4 py-2 rounded hover:bg-blue-50">Baixar Guia</button>
+        </div>
       </div>
     </div>
-  </div>
   </section>
 
-
-  <!-- Seção Sobre -->
+  <!-- ======== SOBRE ======== -->
   <section id="sobre" class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
@@ -152,114 +173,94 @@
     </div>
   </section>
 
-
-  <!-- Seção Palestrantes -->
+  <!-- ======== PALESTRANTES ======== -->
   <section id="palestrantes" class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl font-bold text-uni-blue mb-4">Palestrantes Confirmados</h2>
         <div class="h-1 w-20 bg-uni-accent mx-auto rounded"></div>
       </div>
-
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
         <!-- Palestrante 1 -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
           <div class="h-48 bg-gray-200 flex items-center justify-center">
-            <!-- Placeholder para imagem -->
-            <div
-              class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">
-              AS</div>
+            <div class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">AS</div>
           </div>
           <div class="p-6 text-center">
             <h3 class="font-bold text-xl mb-1">Prof. Dr. Alan Silva</h3>
             <p class="text-sm text-uni-accent font-semibold mb-3">Inteligência Artificial</p>
-            <p class="text-gray-600 text-sm">Pesquisador chefe do laboratório de IA da Universidade Estadual. Autor de
-              diversos artigos internacionais.</p>
+            <p class="text-gray-600 text-sm">Pesquisador chefe do laboratório de IA da Universidade Estadual. Autor de diversos artigos internacionais.</p>
           </div>
         </div>
-
 
         <!-- Palestrante 2 -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
           <div class="h-48 bg-gray-200 flex items-center justify-center">
-            <div
-              class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">
-              MC</div>
+            <div class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">MC</div>
           </div>
           <div class="p-6 text-center">
             <h3 class="font-bold text-xl mb-1">Dra. Mariana Costa</h3>
             <p class="text-sm text-uni-accent font-semibold mb-3">Segurança da Informação</p>
-            <p class="text-gray-600 text-sm">Consultora de cibersegurança e ex-aluna da instituição. Especialista em
-              testes de invasão.</p>
+            <p class="text-gray-600 text-sm">Consultora de cibersegurança e ex-aluna da instituição. Especialista em testes de invasão.</p>
           </div>
         </div>
-
 
         <!-- Palestrante 3 -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
           <div class="h-48 bg-gray-200 flex items-center justify-center">
-            <div
-              class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">
-              RO</div>
+            <div class="w-32 h-32 rounded-full bg-uni-blue text-white flex items-center justify-center text-4xl font-bold border-4 border-white shadow-lg">RO</div>
           </div>
           <div class="p-6 text-center">
             <h3 class="font-bold text-xl mb-1">MSc. Roberto Oliveira</h3>
             <p class="text-sm text-uni-accent font-semibold mb-3">Engenharia de Software</p>
-            <p class="text-gray-600 text-sm">Tech Lead em uma multinacional. Abordará metodologias ágeis e arquitetura
-              de sistemas.</p>
+            <p class="text-gray-600 text-sm">Tech Lead em uma multinacional. Abordará metodologias ágeis e arquitetura de sistemas.</p>
           </div>
         </div>
+
       </div>
     </div>
   </section>
 
-
-  <!-- Seção Programação -->
+  <!-- ======== PROGRAMAÇÃO ======== -->
   <section id="programacao" class="py-16 bg-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl font-bold text-uni-blue mb-4">Programação</h2>
         <div class="h-1 w-20 bg-uni-accent mx-auto rounded"></div>
       </div>
-
-
       <div class="bg-white border border-gray-200 rounded-lg shadow overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-uni-blue text-white">
             <tr>
-              <th scope="col" class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Horário</th>
-              <th scope="col" class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Atividade</th>
-              <th scope="col"
-                class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider hidden sm:table-cell">Local
-              </th>
+              <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Horário</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Atividade</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider hidden sm:table-cell">Local</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <!-- Linha 1 -->
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">08:00 - 09:00</td>
               <td class="px-6 py-4 text-sm text-gray-500">Credenciamento e Coffee Break</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Saguão Principal</td>
             </tr>
-            <!-- Linha 2 -->
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">09:00 - 10:30</td>
-              <td class="px-6 py-4 text-sm text-gray-500 font-semibold text-uni-blue">Palestra de Abertura: O Futuro da
-                IA <br /><span class="font-normal text-xs text-gray-400">Prof. Dr. Alan Silva</span></td>
+              <td class="px-6 py-4 text-sm text-gray-500 font-semibold text-uni-blue">
+                Palestra de Abertura: O Futuro da IA<br>
+                <span class="font-normal text-xs text-gray-400">Prof. Dr. Alan Silva</span>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Auditório 1</td>
             </tr>
-            <!-- Linha 3 -->
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">10:45 - 12:00</td>
               <td class="px-6 py-4 text-sm text-gray-500">Mesa Redonda: Mercado de Trabalho na Região Norte</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Auditório 1</td>
             </tr>
-            <!-- Linha 4 -->
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">14:00 - 17:00</td>
               <td class="px-6 py-4 text-sm text-gray-500">Workshops Práticos (Várias Salas)</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Laboratórios (Bloco B)
-              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Laboratórios (Bloco B)</td>
             </tr>
           </tbody>
         </table>
@@ -267,8 +268,7 @@
     </div>
   </section>
 
-
-  <!-- Footer -->
+  <!-- ======== FOOTER ======== -->
   <footer class="bg-gray-900 text-white mt-auto py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
       <div>
@@ -276,75 +276,75 @@
           <i class="fa-solid fa-graduation-cap text-2xl text-uni-accent"></i>
           <span class="font-bold text-xl">Universidade do Estado do Pará</span>
         </div>
-        <p class="text-gray-400 text-sm">Fomentando a educação, ciência e tecnologia para o desenvolvimento da
-          sociedade.</p>
+        <p class="text-gray-400 text-sm">Fomentando a educação, ciência e tecnologia para o desenvolvimento da sociedade.</p>
       </div>
       <div>
         <h4 class="font-bold mb-4 text-uni-accent">Contato da Organização</h4>
-        <p class="text-gray-400 text-sm mb-2"><i class="fa-solid fa-envelope mr-2"></i> evento@universidade.edu.br</p>
-        <p class="text-gray-400 text-sm"><i class="fa-solid fa-phone mr-2"></i> (00) 1234-5678</p>
+        <p class="text-gray-400 text-sm mb-2">
+          <i class="fa-solid fa-envelope mr-2"></i>
+          <a href="mailto:suti2026@uepa.br" class="hover:text-white transition">suti2026@uepa.br</a>
+        </p>
+        <p class="text-gray-400 text-sm">
+          <i class="fa-solid fa-phone mr-2"></i> (00) 1234-5678
+        </p>
       </div>
       <div>
         <h4 class="font-bold mb-4 text-uni-accent">Siga-nos</h4>
         <div class="flex gap-4">
-          <a href="#" class="text-gray-400 hover:text-white transition"><i
-              class="fa-brands fa-instagram text-2xl"></i></a>
-          <a href="#" class="text-gray-400 hover:text-white transition"><i
-              class="fa-brands fa-linkedin text-2xl"></i></a>
-          <a href="#" class="text-gray-400 hover:text-white transition"><i
-              class="fa-brands fa-youtube text-2xl"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i class="fa-brands fa-instagram text-2xl"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i class="fa-brands fa-linkedin text-2xl"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i class="fa-brands fa-youtube text-2xl"></i></a>
         </div>
       </div>
     </div>
     <div class="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-500">
-      &copy; 2026 Simpósio Acadêmico. Todos os direitos reservados. (Projeto Cascata)
+      &copy; 2026 Simpósio Acadêmico. Todos os direitos reservados.
     </div>
   </footer>
 
-
-  <!-- Modal de Inscrição (Escondido por padrão) -->
+  <!-- ======== MODAL DE INSCRIÇÃO ======== -->
   <div id="inscricaoModal"
     class="modal-hidden fixed inset-0 bg-black bg-opacity-60 z-[60] justify-center items-center backdrop-blur-sm">
     <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md p-6 relative">
       <button onclick="toggleModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition">
         <i class="fa-solid fa-xmark text-2xl"></i>
       </button>
-      <h3 class="text-2xl font-bold text-uni-blue mb-4">Formulário de Inscrição</h3>
-      <p class="text-gray-600 text-sm mb-6">Preencha seus dados para garantir sua vaga no SUTI 2026.</p>
+      <h3 class="text-2xl font-bold text-uni-blue mb-1">Formulário de Inscrição</h3>
+      <p class="text-gray-500 text-sm mb-5">Preencha seus dados para garantir sua vaga no SUTI 2026.</p>
 
       <form id="formInscricao" onsubmit="realizarInscricao(event)" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
-          <input type="text" required
+          <label for="regNome" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+          <input id="regNome" type="text" required placeholder="Seu nome completo"
             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue text-gray-700">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">E-mail Institucional</label>
-          <input type="email" required
+          <label for="regEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail Institucional</label>
+          <input id="regEmail" type="email" required placeholder="seu@email.com"
             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue text-gray-700">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">crie sua senha</label>
-          <input type="password" id="regSenha" required
+          <label for="regSenha" class="block text-sm font-medium text-gray-700 mb-1">Crie sua Senha</label>
+          <input id="regSenha" type="password" required placeholder="Mínimo 6 caracteres" minlength="6"
             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue text-gray-700">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula (Opcional para externos)</label>
-          <input type="text"
+          <label for="regMatricula" class="block text-sm font-medium text-gray-700 mb-1">Matrícula <span class="text-gray-400 font-normal">(Opcional para externos)</span></label>
+          <input id="regMatricula" type="text" placeholder="Ex: 2023001234"
             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-uni-blue text-gray-700">
         </div>
-        <button type="submit"
-          class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition mt-4">
-          Confirmar Inscrição
+        <button id="btnInscricao" type="submit"
+          class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition mt-2 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+          <i id="btnInscricaoIcon" class="fa-solid fa-user-plus"></i>
+          <span id="btnInscricaoTexto">Confirmar Inscrição</span>
         </button>
       </form>
 
-
-      <!-- Mensagem de Sucesso (escondida por padrão) -->
+      <!-- Mensagem de Sucesso -->
       <div id="mensagemSucesso" class="hidden text-center py-6">
         <div class="text-green-500 text-5xl mb-4"><i class="fa-solid fa-circle-check"></i></div>
         <h4 class="text-xl font-bold text-gray-800 mb-2">Inscrição Realizada!</h4>
-        <p class="text-gray-600 text-sm mb-6">Você receberá a confirmação no seu e-mail.</p>
+        <p class="text-gray-600 text-sm mb-6">Você receberá a confirmação no seu e-mail em breve.</p>
         <button onclick="toggleModal()"
           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition">
           Fechar
@@ -353,141 +353,304 @@
     </div>
   </div>
 
-  <div id="loginModal" class="modal-hidden fixed inset-0 bg-black bg-opacity-60 z-[60] justify-center items-center backdrop-blur-sm">
-  <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md p-6 relative">
-    <button onclick="toggleLoginModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition">
-      <i class="fa-solid fa-xmark text-2xl"></i>
-    </button>
-    <h3 class="text-2xl font-bold text-uni-blue mb-4">Entrar no Sistema</h3>
-    
-    <form onsubmit="realizarLogin(event)" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Seu E-mail</label>
-        <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none text-gray-700">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Sua senha</label>
-        <input type="password" id="loginSenha" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none text-gray-700">
-      </div>
-      <button type="submit" class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition">
-        Entrar
+  <!-- ======== MODAL DE LOGIN ======== -->
+  <div id="loginModal"
+    class="modal-hidden fixed inset-0 bg-black bg-opacity-60 z-[60] justify-center items-center backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md p-6 relative">
+      <button onclick="toggleLoginModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition">
+        <i class="fa-solid fa-xmark text-2xl"></i>
       </button>
-    </form>
+      <h3 class="text-2xl font-bold text-uni-blue mb-1">Entrar no Sistema</h3>
+      <p class="text-gray-500 text-sm mb-5">Acesse sua área de inscrito.</p>
+
+      <form id="formLogin" onsubmit="realizarLogin(event)" class="space-y-4">
+        <div>
+          <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">Seu E-mail</label>
+          <input id="loginEmail" type="email" required placeholder="seu@email.com" autocomplete="email"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none text-gray-700">
+        </div>
+        <div>
+          <label for="loginSenha" class="block text-sm font-medium text-gray-700 mb-1">Sua Senha</label>
+          <input id="loginSenha" type="password" required placeholder="Sua senha" autocomplete="current-password"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-uni-blue outline-none text-gray-700">
+        </div>
+        <button id="btnLogin" type="submit"
+          class="w-full bg-uni-blue hover:bg-[#1A1C54] text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+          <i id="btnLoginIcon" class="fa-solid fa-right-to-bracket"></i>
+          <span id="btnLoginTexto">Entrar</span>
+        </button>
+      </form>
+    </div>
   </div>
-</div>
 
-
-  <!-- Regras de Negócio e Interatividade (Simulando Back-end leve) -->
+  <!-- ======== SCRIPTS ======== -->
   <script>
-    const modal = document.getElementById('inscricaoModal');
-    const form = document.getElementById('formInscricao');
-    const sucessoMsg = document.getElementById('mensagemSucesso');
+    /* -------------------------------------------------------
+       TOAST — notificações visuais no lugar de alert()
+    ------------------------------------------------------- */
+    function showToast(msg, tipo = 'info') {
+      const toast   = document.getElementById('toast');
+      const toastMsg  = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
 
+      const config = {
+        success: { bg: 'bg-green-600',  icon: 'fa-solid fa-circle-check' },
+        error:   { bg: 'bg-red-600',    icon: 'fa-solid fa-circle-xmark'  },
+        info:    { bg: 'bg-uni-blue',   icon: 'fa-solid fa-circle-info'   },
+        warning: { bg: 'bg-yellow-500', icon: 'fa-solid fa-triangle-exclamation' },
+      };
 
-    // Função para abrir/fechar o modal de inscrição
+      const { bg, icon } = config[tipo] || config.info;
+
+      // Limpa classes de cor anteriores
+      toast.className = toast.className.replace(/bg-\S+/g, '').trim();
+      toast.classList.add(bg, 'show', 'fixed', 'bottom-6', 'right-6', 'z-[100]',
+        'flex', 'items-center', 'gap-3', 'px-5', 'py-4',
+        'rounded-xl', 'shadow-2xl', 'text-white', 'text-sm', 'font-medium', 'max-w-sm');
+      toast.classList.remove('hide');
+
+      toastIcon.className = icon;
+      toastMsg.textContent = msg;
+
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.classList.remove('show');
+        toast.classList.add('hide');
+      }, 4000);
+    }
+
+    /* -------------------------------------------------------
+       SESSÃO — persistência via sessionStorage
+    ------------------------------------------------------- */
+    const Sessao = {
+      salvar(usuario) {
+        sessionStorage.setItem('suti_usuario', JSON.stringify(usuario));
+      },
+      carregar() {
+        try {
+          const raw = sessionStorage.getItem('suti_usuario');
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      },
+      limpar() {
+        sessionStorage.removeItem('suti_usuario');
+      }
+    };
+
+    /* -------------------------------------------------------
+       MODAIS
+    ------------------------------------------------------- */
     function toggleModal() {
-      if (modal.classList.contains('modal-hidden')) {
-        modal.classList.remove('modal-hidden');
-        modal.classList.add('modal-active');
-        // Reseta o form sempre que abrir
+      const modal     = document.getElementById('inscricaoModal');
+      const form      = document.getElementById('formInscricao');
+      const sucessoMsg = document.getElementById('mensagemSucesso');
+      const isHidden  = modal.classList.contains('modal-hidden');
+
+      if (isHidden) {
+        modal.classList.replace('modal-hidden', 'modal-active');
         form.style.display = 'block';
         sucessoMsg.classList.add('hidden');
         form.reset();
+        setLoadingInscricao(false); // Garante que botão não fique em loading
       } else {
-        modal.classList.add('modal-hidden');
-        modal.classList.remove('modal-active');
+        modal.classList.replace('modal-active', 'modal-hidden');
       }
     }
 
-    // Função para abrir/fechar o modal de Login
-function toggleLoginModal() {
-    const modal = document.getElementById('loginModal');
-    modal.classList.toggle('modal-hidden');
-    modal.classList.toggle('modal-active');
-}
+    function toggleLoginModal() {
+      const modal = document.getElementById('loginModal');
+      modal.classList.toggle('modal-hidden');
+      modal.classList.toggle('modal-active');
+      if (modal.classList.contains('modal-hidden')) {
+        document.getElementById('formLogin').reset();
+        setLoadingLogin(false);
+      }
+    }
 
-// Função que chama o backend para logar
-async function realizarLogin(event) {
-    event.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const senha = document.getElementById('loginSenha').value;
+    /** Abre modal de inscrição somente se o usuário NÃO estiver logado */
+    function abrirModalInscricao() {
+      if (Sessao.carregar()) {
+        showToast('Você já está inscrito! Acesse seu painel acima.', 'info');
+        document.getElementById('areaDoAluno').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      toggleModal();
+    }
 
-    try {
+    /* -------------------------------------------------------
+       LOADING STATE — botões
+    ------------------------------------------------------- */
+    function setLoadingLogin(loading) {
+      const btn   = document.getElementById('btnLogin');
+      const icon  = document.getElementById('btnLoginIcon');
+      const texto = document.getElementById('btnLoginTexto');
+      btn.disabled = loading;
+      icon.className  = loading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-right-to-bracket';
+      texto.textContent = loading ? 'Entrando...' : 'Entrar';
+    }
+
+    function setLoadingInscricao(loading) {
+      const btn   = document.getElementById('btnInscricao');
+      const icon  = document.getElementById('btnInscricaoIcon');
+      const texto = document.getElementById('btnInscricaoTexto');
+      btn.disabled = loading;
+      icon.className  = loading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-user-plus';
+      texto.textContent = loading ? 'Processando...' : 'Confirmar Inscrição';
+    }
+
+    /* -------------------------------------------------------
+       LOGIN
+    ------------------------------------------------------- */
+    async function realizarLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const senha = document.getElementById('loginSenha').value;
+
+      if (!email || !senha) {
+        showToast('Preencha e-mail e senha.', 'warning');
+        return;
+      }
+
+      setLoadingLogin(true);
+
+      try {
         const resposta = await fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, senha })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, senha }),
+          signal: AbortSignal.timeout(10000) // timeout de 10 s
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok && resultado.usuario) {
+          Sessao.salvar(resultado.usuario);
+          toggleLoginModal();
+          atualizarInterface(resultado.usuario);
+          showToast(`Bem-vindo(a), ${resultado.usuario.nome}!`, 'success');
+        } else {
+          showToast(resultado.mensagem || 'E-mail ou senha incorretos.', 'error');
+        }
+      } catch (erro) {
+        if (erro.name === 'TimeoutError') {
+          showToast('O servidor demorou para responder. Tente novamente.', 'error');
+        } else if (erro.name === 'TypeError') {
+          showToast('Não foi possível conectar ao servidor.', 'error');
+        } else {
+          showToast('Erro inesperado. Tente novamente.', 'error');
+        }
+        console.error('[Login]', erro);
+      } finally {
+        setLoadingLogin(false);
+      }
+    }
+
+    /* -------------------------------------------------------
+       INSCRIÇÃO / REGISTRO
+    ------------------------------------------------------- */
+    async function realizarInscricao(event) {
+      event.preventDefault();
+
+      const nome      = document.getElementById('regNome').value.trim();
+      const email     = document.getElementById('regEmail').value.trim();
+      const senha     = document.getElementById('regSenha').value;
+      const matricula = document.getElementById('regMatricula').value.trim();
+
+      // Validações adicionais no cliente
+      if (nome.length < 3) {
+        showToast('Informe um nome com pelo menos 3 caracteres.', 'warning');
+        return;
+      }
+      if (senha.length < 6) {
+        showToast('A senha deve ter pelo menos 6 caracteres.', 'warning');
+        return;
+      }
+
+      setLoadingInscricao(true);
+
+      try {
+        const resposta = await fetch('/registrar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, senha, matricula }),
+          signal: AbortSignal.timeout(10000)
         });
 
         const resultado = await resposta.json();
 
         if (resposta.ok) {
-            toggleLoginModal();
-            atualizarInterface(resultado.usuario); // Aqui a interface muda!
+          // Exibe tela de sucesso dentro do modal
+          document.getElementById('formInscricao').style.display = 'none';
+          document.getElementById('mensagemSucesso').classList.remove('hidden');
+          showToast('Inscrição realizada com sucesso!', 'success');
+
+          // Se o back-end retornar usuário logado automaticamente, salva sessão
+          if (resultado.usuario) {
+            Sessao.salvar(resultado.usuario);
+            atualizarInterface(resultado.usuario);
+          }
         } else {
-            alert(resultado.mensagem);
+          showToast(resultado.mensagem || 'Erro ao realizar inscrição. Tente novamente.', 'error');
         }
-    } catch (erro) {
-        alert("Erro ao conectar com o servidor.");
+      } catch (erro) {
+        if (erro.name === 'TimeoutError') {
+          showToast('O servidor demorou para responder. Tente novamente.', 'error');
+        } else if (erro.name === 'TypeError') {
+          showToast('Não foi possível conectar ao servidor.', 'error');
+        } else {
+          showToast('Erro inesperado. Tente novamente.', 'error');
+        }
+        console.error('[Inscrição]', erro);
+      } finally {
+        setLoadingInscricao(false);
+      }
     }
-}
 
-
-    // Função que realiza o envio dos dados (Fase de Implementação Back-end mockada)
-    async function realizarInscricao(event) {
-  event.preventDefault();
-  
-  const nome = event.target.querySelector('input[type="text"]').value;
-  const email = event.target.querySelector('input[type="email"]').value;
-  const senha = document.getElementById('regSenha').value; // Pegando a senha
-
-  try {
-    const resposta = await fetch('/registrar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, email, senha }) // Enviando a senha
-    });
-
-    if (resposta.ok) {
-      form.style.display = 'none';
-      sucessoMsg.classList.remove('hidden');
+    /* -------------------------------------------------------
+       INTERFACE — alternar visibilidade conforme autenticação
+    ------------------------------------------------------- */
+    function atualizarInterface(usuario) {
+      document.getElementById('visitanteLinks').classList.add('hidden');
+      document.getElementById('alunoLinks').classList.remove('hidden');
+      document.getElementById('alunoLinks').classList.add('flex');
+      document.getElementById('areaDoAluno').classList.remove('hidden');
+      document.getElementById('nomeAluno').innerText = usuario.nome;
     }
-  } catch (erro) {
-    alert("Erro ao conectar com o servidor.");
-  }
-}
 
-// Função que atualiza a interface para o modo "Logado"
-function atualizarInterface(usuario) {
-    // Esconde botões de visitante e mostra os de aluno
-    document.getElementById('visitanteLinks').classList.add('hidden');
-    document.getElementById('alunoLinks').classList.remove('hidden');
-    document.getElementById('areaDoAluno').classList.remove('hidden');
+    function resetarInterface() {
+      document.getElementById('visitanteLinks').classList.remove('hidden');
+      document.getElementById('alunoLinks').classList.add('hidden');
+      document.getElementById('alunoLinks').classList.remove('flex');
+      document.getElementById('areaDoAluno').classList.add('hidden');
+      document.getElementById('nomeAluno').innerText = '';
+    }
 
-    // Coloca o nome do aluno no texto
-    document.getElementById('nomeAluno').innerText = usuario.nome;
-}
+    /* -------------------------------------------------------
+       LOGOUT
+    ------------------------------------------------------- */
+    function realizarLogout() {
+      Sessao.limpar();
+      resetarInterface();
+      // Limpa campos dos formulários
+      document.getElementById('formLogin').reset();
+      document.getElementById('formInscricao').reset();
+      setLoadingLogin(false);
+      setLoadingInscricao(false);
+      showToast('Você saiu da sua conta.', 'info');
+    }
 
-// Função para Sair (Logout)
-function realizarLogout() {
-    // 1. Inverte a visibilidade das seções
-    document.getElementById('visitanteLinks').classList.remove('hidden');
-    document.getElementById('alunoLinks').classList.add('hidden');
-    document.getElementById('areaDoAluno').classList.add('hidden');
-    
-    // 2. LIMPEZA: Reseta os campos de login e registro
-    // Você pode limpar um por um pelo ID:
-    document.getElementById('loginEmail').value = "";
-    document.getElementById('loginSenha').value = "";
-    
-    // Dica de Engenharia: Também é bom limpar o formulário de registro
-    // se você tiver atribuído um ID ao form (ex: id="formInscricao")
-    const formInscricao = document.getElementById('formInscricao');
-    if (formInscricao) formInscricao.reset();
-
-    alert("Você saiu do sistema com segurança.");
-}
+    /* -------------------------------------------------------
+       INIT — restaura sessão ao carregar a página
+    ------------------------------------------------------- */
+    (function init() {
+      const usuario = Sessao.carregar();
+      if (usuario) {
+        atualizarInterface(usuario);
+      }
+    })();
   </script>
-</body>
 
+</body>
 </html>

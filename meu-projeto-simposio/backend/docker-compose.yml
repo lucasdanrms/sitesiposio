@@ -27,23 +27,13 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: simposio_db
+    volumes:
+    - .:/usr/src/app            
+    - /usr/src/app/node_modules 
+    command: npm run dev
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   db_data:
-
-
-phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: simposio_pma
-    restart: always
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: db
-      PMA_USER: root
-      PMA_PASSWORD: root
-    depends_on:
-      - db
